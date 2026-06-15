@@ -165,12 +165,84 @@
     .legend-dot{width:10px;height:10px;border-radius:50%;flex-shrink:0;}
     .chart-empty{text-align:center;padding:60px 0;color:var(--muted);font-size:.9rem;}
 
+    /* ── 태블릿 ── */
     @media(max-width:720px){
       .main{grid-template-columns:1fr;}
       .summary{grid-template-columns:1fr 1fr;}
       .s-card.balance{grid-column:span 2;}
       .settle-grid{grid-template-columns:1fr;}
       .chart-grid{grid-template-columns:1fr;}
+    }
+
+    /* ── 모바일 ── */
+    @media(max-width:480px){
+      /* 헤더: 타이틀 위, 월 네비 아래 */
+      header{padding:10px 14px;flex-direction:column;align-items:center;gap:6px;}
+      header h1{font-size:1.05rem;white-space:nowrap;}
+      .month-nav{justify-content:center;}
+      .month-nav span{font-size:.88rem;min-width:96px;}
+      .month-nav button{width:28px;height:28px;font-size:.95rem;}
+
+      /* 탭: 가로 스크롤, 줄바꿈 방지 */
+      .tab-nav{padding:0 4px;overflow-x:auto;-webkit-overflow-scrolling:touch;flex-wrap:nowrap;}
+      .tab-nav::-webkit-scrollbar{display:none;}
+      .tab-nav button{font-size:.78rem;padding:9px 12px;white-space:nowrap;flex-shrink:0;}
+
+      /* 요약 카드: 수입·지출 나란히, 잔액 전체 */
+      .summary{grid-template-columns:1fr 1fr;gap:8px;padding:10px 10px 0;}
+      .s-card.balance{grid-column:span 2;}
+      .s-card{padding:10px 12px;border-radius:14px;}
+      .s-card .s-icon{font-size:.9rem;margin-bottom:1px;}
+      .s-card .label{font-size:.6rem;margin-bottom:3px;}
+      .s-card .amount{font-size:.95rem;}
+
+      /* 가계부 탭 */
+      .main{gap:12px;padding:12px 10px;}
+      .card{padding:16px 14px;border-radius:18px;}
+      .card h2{font-size:.88rem;margin-bottom:12px;}
+      form .field{margin-bottom:9px;}
+      form input,form select{padding:9px 11px;font-size:.85rem;border-radius:11px;}
+      .type-toggle{gap:6px;}
+      .type-toggle button{font-size:.8rem;padding:8px;}
+      .btn-add{padding:11px;font-size:.92rem;}
+
+      /* 거래 내역 */
+      .list-header{flex-direction:column;align-items:stretch;gap:8px;margin-bottom:10px;}
+      .list-header h2{white-space:nowrap;}
+      .filter-tabs button{padding:4px 11px;font-size:.72rem;}
+      .transaction-list{max-height:none;gap:8px;}
+      .tx-item{padding:10px 11px;gap:9px;border-radius:13px;}
+      .tx-icon{width:36px;height:36px;font-size:1.05rem;border-radius:11px;}
+      .tx-info .tx-desc{font-size:.82rem;}
+      .tx-info .tx-meta{font-size:.68rem;}
+      .tx-amount{font-size:.85rem;}
+      .tx-delete{width:26px;height:26px;font-size:.72rem;}
+      .category-badge{font-size:.62rem;padding:1px 6px;}
+
+      /* 예산 탭 */
+      .budget-wrap{padding:12px 10px;}
+      .budget-total-card{padding:12px 14px;gap:8px;}
+      .budget-total-card .bt-val{font-size:.95rem;}
+      .budget-total-card .bt-label{font-size:.65rem;}
+      .budget-grid{grid-template-columns:1fr;gap:10px;}
+      .budget-item{padding:12px 14px;border-radius:14px;}
+      .btn-save-budget{padding:10px 20px;font-size:.88rem;}
+
+      /* 결산 탭 */
+      .settlement-wrap{padding:12px 10px;}
+      .settle-grid{grid-template-columns:1fr;gap:10px;}
+      .settle-card{padding:14px 14px;border-radius:16px;}
+      .settle-card h3{font-size:.8rem;margin-bottom:9px;}
+      .settle-row .sr-label{font-size:.76rem;}
+      .settle-row .sr-val{font-size:.82rem;}
+
+      /* 차트 탭 */
+      .chart-wrap{padding:12px 10px;}
+      .chart-grid{grid-template-columns:1fr;gap:12px;}
+      .chart-card{padding:16px 14px;border-radius:18px;}
+      .chart-card h3{font-size:.85rem;margin-bottom:12px;}
+      .legend{gap:6px;}
+      .legend-item{font-size:.68rem;}
     }
 
     @keyframes popIn{0%{transform:scale(.85);opacity:0}70%{transform:scale(1.04)}100%{transform:scale(1);opacity:1}}
