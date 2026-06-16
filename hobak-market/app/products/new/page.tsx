@@ -4,6 +4,7 @@ import { createClient } from '@/lib/supabase/client'
 import { useRouter } from 'next/navigation'
 import Link from 'next/link'
 import { useState } from 'react'
+import ImageUploader from '@/components/ImageUploader'
 
 const CATEGORIES = [
   '디지털/가전',
@@ -23,6 +24,7 @@ export default function NewProductPage() {
   const [price, setPrice] = useState('')
   const [description, setDescription] = useState('')
   const [tradeType, setTradeType] = useState('직거래')
+  const [images, setImages] = useState<string[]>([])
   const [error, setError] = useState('')
   const [loading, setLoading] = useState(false)
 
@@ -53,6 +55,7 @@ export default function NewProductPage() {
         price: parseInt(price, 10),
         category,
         trade_type: tradeType,
+        images,
       })
       .select('id')
       .single()
@@ -95,6 +98,15 @@ export default function NewProductPage() {
           {error && <div className="error-msg mb-4">{error}</div>}
 
           <form onSubmit={handleSubmit} className="flex flex-col gap-5">
+
+            {/* 사진 */}
+            <div>
+              <label className="block text-sm font-bold mb-1.5" style={{ color: 'var(--brown-text)' }}>
+                사진 <span className="font-normal text-xs" style={{ color: 'var(--brown-muted)' }}>(선택 · 최대 10장)</span>
+              </label>
+              <ImageUploader images={images} onChange={setImages} />
+            </div>
+
             {/* 제목 */}
             <div>
               <label className="block text-sm font-bold mb-1.5" style={{ color: 'var(--brown-text)' }}>

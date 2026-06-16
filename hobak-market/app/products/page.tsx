@@ -21,7 +21,7 @@ export default async function ProductsPage({
     (() => {
       let query = supabase
         .from('products')
-        .select('id, title, price, category, status, trade_type, created_at, seller:profiles!products_user_id_profiles_fkey(nickname)')
+        .select('id, title, price, category, status, trade_type, created_at, images, seller:profiles!products_user_id_profiles_fkey(nickname)')
         .order('created_at', { ascending: false })
       if (category && category !== '전체') {
         query = query.eq('category', category)
@@ -150,9 +150,13 @@ export default async function ProductsPage({
                       : {}}
                   >
                     {/* 썸네일 */}
-                    <div className="w-20 h-20 rounded-xl flex-shrink-0 flex items-center justify-center text-3xl"
+                    <div className="w-20 h-20 rounded-xl flex-shrink-0 overflow-hidden flex items-center justify-center text-3xl"
                       style={{ background: 'var(--pumpkin-pale)' }}>
-                      🎃
+                      {(product as { images?: string[] }).images?.[0]
+                        // eslint-disable-next-line @next/next/no-img-element
+                        ? <img src={(product as { images?: string[] }).images![0]} alt={product.title}
+                            className="w-full h-full object-cover" />
+                        : '🎃'}
                     </div>
 
                     {/* 정보 */}

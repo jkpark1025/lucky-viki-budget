@@ -4,6 +4,7 @@ import { createClient } from '@/lib/supabase/client'
 import { useRouter } from 'next/navigation'
 import Link from 'next/link'
 import { useState } from 'react'
+import ImageUploader from '@/components/ImageUploader'
 
 const CATEGORIES = [
   '디지털/가전', '가구/인테리어', '의류/패션', '도서/음반',
@@ -17,6 +18,7 @@ interface Product {
   price: number
   category: string
   status: string
+  images: string[]
 }
 
 export default function EditProductForm({ product }: { product: Product }) {
@@ -26,6 +28,7 @@ export default function EditProductForm({ product }: { product: Product }) {
   const [price, setPrice] = useState(String(product.price))
   const [description, setDescription] = useState(product.description)
   const [status, setStatus] = useState(product.status)
+  const [images, setImages] = useState<string[]>(product.images ?? [])
   const [error, setError] = useState('')
   const [loading, setLoading] = useState(false)
 
@@ -49,6 +52,7 @@ export default function EditProductForm({ product }: { product: Product }) {
         price: parseInt(price, 10),
         category,
         status,
+        images,
       })
       .eq('id', product.id)
 
@@ -118,6 +122,14 @@ export default function EditProductForm({ product }: { product: Product }) {
                   </button>
                 ))}
               </div>
+            </div>
+
+            {/* 사진 */}
+            <div>
+              <label className="block text-sm font-bold mb-1.5" style={{ color: 'var(--brown-text)' }}>
+                사진 <span className="font-normal text-xs" style={{ color: 'var(--brown-muted)' }}>(최대 10장)</span>
+              </label>
+              <ImageUploader images={images} onChange={setImages} />
             </div>
 
             {/* 제목 */}

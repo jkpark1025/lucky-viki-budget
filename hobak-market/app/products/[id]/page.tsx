@@ -3,6 +3,7 @@ import { notFound } from 'next/navigation'
 import Link from 'next/link'
 import Header from '@/components/Header'
 import ProductActions from '@/components/ProductActions'
+import ImageGallery from '@/components/ImageGallery'
 
 const STATUS_LABEL: Record<string, string> = { selling: '판매중', reserved: '예약중', sold: '거래완료' }
 const STATUS_COLOR: Record<string, string> = { selling: '#5D8A3C', reserved: '#E8650A', sold: '#999' }
@@ -30,6 +31,7 @@ export default async function ProductDetailPage({
   const sellerNickname = seller?.nickname ?? '알 수 없음'
   const isOwner = user?.id === product.user_id
   const isSold = product.status === 'sold'
+  const images: string[] = product.images ?? []
 
   return (
     <div className="min-h-screen flex flex-col" style={{ background: 'var(--pumpkin-cream)' }}>
@@ -47,11 +49,15 @@ export default async function ProductDetailPage({
         {/* 메인 카드 */}
         <div className="card-pumpkin overflow-hidden mb-4">
 
-          {/* 썸네일 영역 */}
-          <div className="w-full flex items-center justify-center py-14"
-            style={{ background: 'var(--pumpkin-pale)' }}>
-            <span className="text-8xl">{isSold ? '📦' : '🎃'}</span>
-          </div>
+          {/* 이미지 영역 */}
+          {images.length > 0 ? (
+            <ImageGallery images={images} title={product.title} />
+          ) : (
+            <div className="w-full flex items-center justify-center py-14"
+              style={{ background: 'var(--pumpkin-pale)' }}>
+              <span className="text-8xl">{isSold ? '📦' : '🎃'}</span>
+            </div>
+          )}
 
           <div className="p-6">
             {/* 상태 + 카테고리 */}
