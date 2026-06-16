@@ -110,3 +110,22 @@ body {
   padding: 10px 14px;
   font-size: 0.875rem;
 }
+
+/* 스크롤바 숨기기 */
+.scrollbar-hide {
+  -ms-overflow-style: none;
+  scrollbar-width: none;
+}
+.scrollbar-hide:webkit-scrollbar {
+  display: none;
+}
+
+/* 채팅방: 모바일에서 하단 nav 높이 제외 */
+.chat-room-height {
+  height: 100dvh;
+}
+@media (max-width: 639px) {
+  .chat-room-height {
+    height: calc(100dvh - 4rem);
+  }
+}

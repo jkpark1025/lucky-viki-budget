@@ -75,11 +75,11 @@ export default async function DashboardPage() {
 
         {/* 메뉴 카드 */}
         <div className="grid grid-cols-2 sm:grid-cols-4 gap-4 mb-8">
-          <div className="card-pumpkin p-4 text-center cursor-default opacity-60">
+          <Link href={`/users/${user.id}`} className="card-pumpkin p-4 text-center no-underline hover:shadow-md transition-shadow">
             <div className="text-3xl mb-2">📦</div>
             <div className="font-bold text-sm mb-0.5" style={{ color: 'var(--brown-text)' }}>내 판매글</div>
-            <div className="text-xs" style={{ color: 'var(--brown-muted)' }}>준비 중</div>
-          </div>
+            <div className="text-xs font-semibold" style={{ color: 'var(--pumpkin)' }}>보러가기</div>
+          </Link>
           <div className="card-pumpkin p-4 text-center">
             <div className="text-3xl mb-2">❤️</div>
             <div className="font-bold text-sm mb-0.5" style={{ color: 'var(--brown-text)' }}>관심 목록</div>
@@ -87,16 +87,16 @@ export default async function DashboardPage() {
               {likedProducts.length}개
             </div>
           </div>
-          <div className="card-pumpkin p-4 text-center cursor-default opacity-60">
+          <Link href="/chat" className="card-pumpkin p-4 text-center no-underline hover:shadow-md transition-shadow">
             <div className="text-3xl mb-2">💬</div>
             <div className="font-bold text-sm mb-0.5" style={{ color: 'var(--brown-text)' }}>채팅</div>
-            <div className="text-xs" style={{ color: 'var(--brown-muted)' }}>준비 중</div>
-          </div>
-          <div className="card-pumpkin p-4 text-center cursor-default opacity-60">
+            <div className="text-xs font-semibold" style={{ color: 'var(--pumpkin)' }}>바로가기</div>
+          </Link>
+          <Link href="/profile/edit" className="card-pumpkin p-4 text-center no-underline hover:shadow-md transition-shadow">
             <div className="text-3xl mb-2">⭐</div>
-            <div className="font-bold text-sm mb-0.5" style={{ color: 'var(--brown-text)' }}>거래 후기</div>
-            <div className="text-xs" style={{ color: 'var(--brown-muted)' }}>준비 중</div>
-          </div>
+            <div className="font-bold text-sm mb-0.5" style={{ color: 'var(--brown-text)' }}>내 프로필</div>
+            <div className="text-xs font-semibold" style={{ color: 'var(--pumpkin)' }}>편집하기</div>
+          </Link>
         </div>
 
         {/* 관심 목록 */}

@@ -56,7 +56,7 @@ export default async function ChatRoomPage({
   const otherAvatar = getAvatar(otherUser?.avatar ?? '0')
 
   return (
-    <div className="flex flex-col" style={{ height: '100dvh', background: 'var(--pumpkin-cream)' }}>
+    <div className="chat-room-height flex flex-col" style={{ background: 'var(--pumpkin-cream)' }}>
       <Header userEmail={user.email} />
 
       {/* 채팅방 헤더 */}

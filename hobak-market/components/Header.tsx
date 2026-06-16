@@ -78,7 +78,7 @@ export default function Header({ userEmail }: HeaderProps) {
               </Link>
               <Link href="/dashboard"
                 className="text-white text-sm font-semibold px-3 py-1.5 rounded-lg
-                  hover:bg-white/20 transition-colors no-underline">
+                  hover:bg-white/20 transition-colors no-underline hidden sm:block">
                 마이페이지
               </Link>
               <button
@@ -87,7 +87,7 @@ export default function Header({ userEmail }: HeaderProps) {
                 className="bg-white/20 hover:bg-white/35 text-white text-sm font-semibold
                   px-3 py-1.5 rounded-lg transition-colors border border-white/30 cursor-pointer"
               >
-                {loading ? '...' : '로그아웃'}
+                {loading ? '...' : <span><span className="hidden sm:inline">로그아웃</span><span className="sm:hidden">나가기</span></span>}
               </button>
             </>
           ) : (
