@@ -3,7 +3,7 @@
 import { createClient } from '@/lib/supabase/client'
 import { useRouter } from 'next/navigation'
 import Link from 'next/link'
-import { useState } from 'react'
+import { useEffect, useState } from 'react'
 
 interface HeaderProps {
   userEmail?: string | null
@@ -13,6 +13,22 @@ export default function Header({ userEmail }: HeaderProps) {
   const router = useRouter()
   const supabase = createClient()
   const [loading, setLoading] = useState(false)
+  const [unreadCount, setUnreadCount] = useState(0)
+
+  useEffect(() => {
+    if (!userEmail) return
+    const fetchUnread = async () => {
+      const { data: { user } } = await supabase.auth.getUser()
+      if (!user) return
+      const { count } = await supabase
+        .from('messages')
+        .select('id', { count: 'exact', head: true })
+        .is('read_at', null)
+        .neq('sender_id', user.id)
+      setUnreadCount(count ?? 0)
+    }
+    fetchUnread()
+  }, [userEmail])
 
   const handleLogout = async () => {
     setLoading(true)
@@ -38,6 +54,15 @@ export default function Header({ userEmail }: HeaderProps) {
             className="text-white/80 hover:text-white text-sm font-semibold no-underline transition-colors hidden sm:block">
             판매글
           </Link>
+          {userEmail && (
+            <Link href="/chat"
+              className="relative text-white/80 hover:text-white text-sm font-semibold no-underline transition-colors hidden sm:block">
+              채팅
+              {unreadCount > 0 && (
+                <span className="absolute -top-1 -right-2 w-2 h-2 rounded-full bg-red-400" />
+              )}
+            </Link>
+          )}
         </div>
 
         <nav className="flex items-center gap-3">
@@ -46,6 +71,11 @@ export default function Header({ userEmail }: HeaderProps) {
               <span className="text-orange-100 text-sm hidden sm:block truncate max-w-[160px]">
                 {userEmail}
               </span>
+              <Link href="/profile/edit"
+                className="text-white text-sm font-semibold px-3 py-1.5 rounded-lg
+                  hover:bg-white/20 transition-colors no-underline hidden sm:block">
+                내 프로필
+              </Link>
               <Link href="/dashboard"
                 className="text-white text-sm font-semibold px-3 py-1.5 rounded-lg
                   hover:bg-white/20 transition-colors no-underline">

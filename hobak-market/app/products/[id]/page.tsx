@@ -6,6 +6,8 @@ import ProductActions from '@/components/ProductActions'
 import ImageGallery from '@/components/ImageGallery'
 import LikeButton from '@/components/LikeButton'
 import CommentSection from '@/components/CommentSection'
+import StartChatButton from '@/components/StartChatButton'
+import { getAvatar } from '@/lib/avatar'
 
 const STATUS_LABEL: Record<string, string> = { selling: '판매중', reserved: '예약중', sold: '거래완료' }
 const STATUS_COLOR: Record<string, string> = { selling: '#5D8A3C', reserved: '#E8650A', sold: '#999' }
@@ -35,7 +37,7 @@ export default async function ProductDetailPage({
   ] = await Promise.all([
     supabase
       .from('products')
-      .select('*, seller:profiles!products_user_id_profiles_fkey(nickname)')
+      .select('*, seller:profiles!products_user_id_profiles_fkey(nickname, avatar)')
       .eq('id', id)
       .single(),
     supabase.auth.getUser(),
@@ -52,8 +54,9 @@ export default async function ProductDetailPage({
 
   if (!product) notFound()
 
-  const seller = product.seller as { nickname?: string } | null
+  const seller = product.seller as { nickname?: string; avatar?: string } | null
   const sellerNickname = seller?.nickname ?? '알 수 없음'
+  const sellerAvatar = getAvatar(seller?.avatar ?? '0')
   const isOwner = user?.id === product.user_id
   const isSold = product.status === 'sold'
   const images: string[] = product.images ?? []
@@ -157,20 +160,21 @@ export default async function ProductDetailPage({
               판매자 정보
             </h2>
             <div className="flex items-center justify-between">
-              <div className="flex items-center gap-3">
-                <div className="w-11 h-11 rounded-full flex items-center justify-center text-lg font-black text-white flex-shrink-0"
-                  style={{ background: 'linear-gradient(135deg, var(--pumpkin), var(--pumpkin-dark))' }}>
-                  {sellerNickname[0]}
+              <Link href={`/users/${product.user_id}`}
+                className="flex items-center gap-3 no-underline group">
+                <div className="w-11 h-11 rounded-full flex items-center justify-center text-xl flex-shrink-0 transition-transform group-hover:scale-105"
+                  style={{ background: sellerAvatar.bg }}>
+                  {sellerAvatar.emoji}
                 </div>
                 <div>
-                  <p className="font-bold" style={{ color: 'var(--brown-text)' }}>
+                  <p className="font-bold transition-colors group-hover:underline" style={{ color: 'var(--brown-text)' }}>
                     {sellerNickname}
                   </p>
                   <p className="text-xs" style={{ color: 'var(--brown-muted)' }}>
-                    호박마켓 이웃
+                    호박마켓 이웃 · 프로필 보기
                   </p>
                 </div>
-              </div>
+              </Link>
 
               {isOwner && (
                 <ProductActions productId={product.id} />
@@ -209,9 +213,7 @@ export default async function ProductDetailPage({
               initialLiked={isLiked}
               isLoggedIn={true}
             />
-            <button className="btn-pumpkin py-4 text-base" disabled>
-              💬 채팅하기 (준비 중)
-            </button>
+            <StartChatButton productId={product.id} />
           </div>
         ) : (
           <div className="card-pumpkin p-4 flex flex-col gap-3">
