@@ -4,9 +4,20 @@ import Link from 'next/link'
 import Header from '@/components/Header'
 import ProductActions from '@/components/ProductActions'
 import ImageGallery from '@/components/ImageGallery'
+import LikeButton from '@/components/LikeButton'
+import CommentSection from '@/components/CommentSection'
 
 const STATUS_LABEL: Record<string, string> = { selling: '판매중', reserved: '예약중', sold: '거래완료' }
 const STATUS_COLOR: Record<string, string> = { selling: '#5D8A3C', reserved: '#E8650A', sold: '#999' }
+
+type CommentRow = {
+  id: string
+  content: string
+  created_at: string
+  updated_at: string
+  user_id: string
+  author: { nickname: string } | null
+}
 
 export default async function ProductDetailPage({
   params,
@@ -16,13 +27,27 @@ export default async function ProductDetailPage({
   const { id } = await params
   const supabase = await createClient()
 
-  const [{ data: product }, { data: { user } }] = await Promise.all([
+  const [
+    { data: product },
+    { data: { user } },
+    { count: likeCount },
+    { data: commentsRaw },
+  ] = await Promise.all([
     supabase
       .from('products')
       .select('*, seller:profiles!products_user_id_profiles_fkey(nickname)')
       .eq('id', id)
       .single(),
     supabase.auth.getUser(),
+    supabase
+      .from('likes')
+      .select('*', { count: 'exact', head: true })
+      .eq('product_id', id),
+    supabase
+      .from('comments')
+      .select('*, author:profiles!comments_user_id_profiles_fkey(nickname)')
+      .eq('product_id', id)
+      .order('created_at', { ascending: true }),
   ])
 
   if (!product) notFound()
@@ -32,6 +57,18 @@ export default async function ProductDetailPage({
   const isOwner = user?.id === product.user_id
   const isSold = product.status === 'sold'
   const images: string[] = product.images ?? []
+  const comments = (commentsRaw ?? []) as CommentRow[]
+
+  let isLiked = false
+  if (user && !isOwner) {
+    const { data: userLike } = await supabase
+      .from('likes')
+      .select('id')
+      .eq('product_id', id)
+      .eq('user_id', user.id)
+      .maybeSingle()
+    isLiked = !!userLike
+  }
 
   return (
     <div className="min-h-screen flex flex-col" style={{ background: 'var(--pumpkin-cream)' }}>
@@ -81,12 +118,20 @@ export default async function ProductDetailPage({
               {product.title}
             </h1>
 
-            {/* 가격 */}
-            <p className="text-3xl font-black mb-1" style={{ color: 'var(--pumpkin)' }}>
-              {product.price === 0
-                ? '🤝 나눔'
-                : `${product.price.toLocaleString()}원`}
-            </p>
+            {/* 가격 + 좋아요 수 */}
+            <div className="flex items-end justify-between mb-1">
+              <p className="text-3xl font-black" style={{ color: 'var(--pumpkin)' }}>
+                {product.price === 0
+                  ? '🤝 나눔'
+                  : `${product.price.toLocaleString()}원`}
+              </p>
+              {/* 비로그인 or 상품 주인 아닌 경우: 좋아요 수 표시 */}
+              {!isOwner && (
+                <span className="text-sm flex items-center gap-1" style={{ color: 'var(--brown-muted)' }}>
+                  ❤️ <span className="font-semibold">{likeCount ?? 0}</span>
+                </span>
+              )}
+            </div>
             <p className="text-xs mb-6" style={{ color: 'var(--brown-muted)' }}>
               {new Date(product.created_at).toLocaleDateString('ko-KR', {
                 year: 'numeric', month: 'long', day: 'numeric',
@@ -145,21 +190,51 @@ export default async function ProductDetailPage({
             </Link>
           </div>
         ) : isSold ? (
-          <div className="card-pumpkin p-4 text-center">
-            <p className="text-sm font-bold" style={{ color: '#999' }}>
+          <div className="card-pumpkin p-4">
+            <p className="text-sm font-bold text-center mb-4" style={{ color: '#999' }}>
               이미 거래가 완료된 상품이에요
             </p>
+            <LikeButton
+              productId={product.id}
+              initialCount={likeCount ?? 0}
+              initialLiked={isLiked}
+              isLoggedIn={!!user}
+            />
           </div>
         ) : user ? (
-          <button className="btn-pumpkin py-4 text-base" disabled>
-            💬 채팅하기 (준비 중)
-          </button>
+          <div className="card-pumpkin p-4 flex flex-col gap-3">
+            <LikeButton
+              productId={product.id}
+              initialCount={likeCount ?? 0}
+              initialLiked={isLiked}
+              isLoggedIn={true}
+            />
+            <button className="btn-pumpkin py-4 text-base" disabled>
+              💬 채팅하기 (준비 중)
+            </button>
+          </div>
         ) : (
-          <Link href="/auth/login"
-            className="btn-pumpkin text-center no-underline py-4 text-base block">
-            로그인하고 채팅하기
-          </Link>
+          <div className="card-pumpkin p-4 flex flex-col gap-3">
+            <LikeButton
+              productId={product.id}
+              initialCount={likeCount ?? 0}
+              initialLiked={false}
+              isLoggedIn={false}
+            />
+            <Link href="/auth/login"
+              className="btn-pumpkin text-center no-underline py-4 text-base block">
+              로그인하고 채팅하기
+            </Link>
+          </div>
         )}
+
+        {/* 댓글 섹션 */}
+        <CommentSection
+          productId={product.id}
+          initialComments={comments}
+          currentUserId={user?.id ?? null}
+          isOwner={isOwner}
+        />
       </main>
     </div>
   )

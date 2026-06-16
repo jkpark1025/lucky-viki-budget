@@ -16,7 +16,7 @@ export default async function ProductsPage({
   const isNanum = nanum === 'true'
   const supabase = await createClient()
 
-  const [{ data: { user } }, productsResult] = await Promise.all([
+  const [{ data: { user } }, productsResult, { data: allLikes }] = await Promise.all([
     supabase.auth.getUser(),
     (() => {
       let query = supabase
@@ -34,9 +34,16 @@ export default async function ProductsPage({
       }
       return query
     })(),
+    supabase.from('likes').select('product_id'),
   ])
 
   const products = productsResult.data ?? []
+
+  // 상품별 좋아요 수 집계
+  const likeCountMap: Record<string, number> = {}
+  allLikes?.forEach((like) => {
+    likeCountMap[like.product_id] = (likeCountMap[like.product_id] ?? 0) + 1
+  })
 
   return (
     <div className="min-h-screen flex flex-col" style={{ background: 'var(--pumpkin-cream)' }}>
@@ -140,6 +147,7 @@ export default async function ProductsPage({
               style={{ border: '1.5px solid var(--pumpkin-border)' }}>
               {products.map((product, idx) => {
                 const seller = product.seller as { nickname?: string } | null
+                const likes = likeCountMap[product.id] ?? 0
                 return (
                   <Link
                     key={product.id}
@@ -182,10 +190,17 @@ export default async function ProductsPage({
                           </span>
                         )}
                       </div>
-                      <p className="text-xs" style={{ color: 'var(--brown-muted)' }}>
-                        {seller?.nickname ?? '알 수 없음'} ·{' '}
-                        {new Date(product.created_at).toLocaleDateString('ko-KR')}
-                      </p>
+                      <div className="flex items-center gap-3">
+                        <p className="text-xs" style={{ color: 'var(--brown-muted)' }}>
+                          {seller?.nickname ?? '알 수 없음'} ·{' '}
+                          {new Date(product.created_at).toLocaleDateString('ko-KR')}
+                        </p>
+                        {likes > 0 && (
+                          <span className="text-xs flex items-center gap-0.5" style={{ color: '#E05050' }}>
+                            ❤️ {likes}
+                          </span>
+                        )}
+                      </div>
                     </div>
 
                     {/* 가격 */}
